@@ -6,14 +6,18 @@ function ProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // NEW STATE (non-breaking)
+  // Existing feature
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // NEW: timestamp feature
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     getProducts()
       .then(data => {
         setProducts(data);
+        setLastUpdated(new Date());
         setLoading(false);
       })
       .catch(() => {
@@ -25,13 +29,8 @@ function ProductList() {
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;
 
-  // NEW: derive categories safely
-  const categories = [
-    "All",
-    ...new Set(products.map(p => p.category))
-  ];
+  const categories = ["All", ...new Set(products.map(p => p.category))];
 
-  // NEW: filtered view (does not mutate original data)
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (selectedCategory === "All" || p.category === selectedCategory)
@@ -39,7 +38,7 @@ function ProductList() {
 
   return (
     <div>
-      {/* NEW CONTROLS */}
+      {/* Controls */}
       <div style={{ marginBottom: "1rem" }}>
         <input
           type="text"
@@ -62,7 +61,13 @@ function ProductList() {
         </select>
       </div>
 
-      {/* OPTIONAL BUT PROFESSIONAL */}
+      {/* NEW: timestamp display */}
+      {lastUpdated && (
+        <p style={{ fontSize: "0.9rem", color: "#555" }}>
+          Last updated: {lastUpdated.toLocaleTimeString()}
+        </p>
+      )}
+
       <p>Showing {filteredProducts.length} products</p>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
