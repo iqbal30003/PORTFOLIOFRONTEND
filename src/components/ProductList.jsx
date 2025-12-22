@@ -6,24 +6,34 @@ function ProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Existing feature
+  // Existing features
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-
-  // NEW: timestamp feature
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  useEffect(() => {
+  // NEW: refresh state
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchProducts = () => {
+    setRefreshing(true);
+    setError(null);
+
     getProducts()
       .then(data => {
         setProducts(data);
         setLastUpdated(new Date());
-        setLoading(false);
       })
       .catch(() => {
         setError("Failed to load products");
+      })
+      .finally(() => {
         setLoading(false);
+        setRefreshing(false);
       });
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
   if (loading) return <p>Loading products...</p>;
@@ -51,7 +61,7 @@ function ProductList() {
         <select
           value={selectedCategory}
           onChange={e => setSelectedCategory(e.target.value)}
-          style={{ padding: "0.25rem" }}
+          style={{ marginRight: "1rem", padding: "0.25rem" }}
         >
           {categories.map(c => (
             <option key={c} value={c}>
@@ -59,9 +69,18 @@ function ProductList() {
             </option>
           ))}
         </select>
+
+        {/* NEW: Refresh button */}
+        <button
+          onClick={fetchProducts}
+          disabled={refreshing}
+          style={{ padding: "0.25rem 0.5rem" }}
+        >
+          {refreshing ? "Refreshing..." : "Refresh Products"}
+        </button>
       </div>
 
-      {/* NEW: timestamp display */}
+      {/* Timestamp */}
       {lastUpdated && (
         <p style={{ fontSize: "0.9rem", color: "#555" }}>
           Last updated: {lastUpdated.toLocaleTimeString()}
