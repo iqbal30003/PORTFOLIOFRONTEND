@@ -10,9 +10,10 @@ function ProductList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [lastUpdated, setLastUpdated] = useState(null);
-
-  // NEW: refresh state
   const [refreshing, setRefreshing] = useState(false);
+
+  // NEW: price sort state
+  const [priceSort, setPriceSort] = useState("asc"); // asc | desc
 
   const fetchProducts = () => {
     setRefreshing(true);
@@ -41,10 +42,23 @@ function ProductList() {
 
   const categories = ["All", ...new Set(products.map(p => p.category))];
 
+  // Filter first
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (selectedCategory === "All" || p.category === selectedCategory)
   );
+
+  // NEW: sort after filtering (non-mutating)
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (priceSort === "asc") {
+      return a.price - b.price;
+    }
+    return b.price - a.price;
+  });
+
+  const toggleSort = () => {
+    setPriceSort(prev => (prev === "asc" ? "desc" : "asc"));
+  };
 
   return (
     <div>
@@ -70,13 +84,17 @@ function ProductList() {
           ))}
         </select>
 
-        {/* NEW: Refresh button */}
         <button
           onClick={fetchProducts}
           disabled={refreshing}
-          style={{ padding: "0.25rem 0.5rem" }}
+          style={{ marginRight: "1rem", padding: "0.25rem 0.5rem" }}
         >
           {refreshing ? "Refreshing..." : "Refresh Products"}
+        </button>
+
+        {/* NEW: Price sort toggle */}
+        <button onClick={toggleSort} style={{ padding: "0.25rem 0.5rem" }}>
+          Sort: Price {priceSort === "asc" ? "↑" : "↓"}
         </button>
       </div>
 
@@ -87,7 +105,7 @@ function ProductList() {
         </p>
       )}
 
-      <p>Showing {filteredProducts.length} products</p>
+      <p>Showing {sortedProducts.length} products</p>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
@@ -98,12 +116,12 @@ function ProductList() {
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <tr>
               <td colSpan="3">No matching products found.</td>
             </tr>
           ) : (
-            filteredProducts.map(p => (
+            sortedProducts.map(p => (
               <tr key={p.id}>
                 <td>{p.name}</td>
                 <td>{p.category}</td>
