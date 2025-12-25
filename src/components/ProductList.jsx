@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getProducts } from "../api/productApi";
 
 function ProductList() {
@@ -12,6 +12,9 @@ function ProductList() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [priceSort, setPriceSort] = useState("asc"); // asc | desc
+
+  // NEW: ref for keyboard shortcut
+  const searchInputRef = useRef(null);
 
   const fetchProducts = () => {
     setRefreshing(true);
@@ -35,6 +38,23 @@ function ProductList() {
     fetchProducts();
   }, []);
 
+  // NEW: keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = e => {
+      // Ignore if typing in an input/select/textarea
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      if (e.key === "/") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;
 
@@ -54,16 +74,11 @@ function ProductList() {
     setPriceSort(prev => (prev === "asc" ? "desc" : "asc"));
   };
 
-  // NEW: CSV export
   const exportToCsv = () => {
     if (sortedProducts.length === 0) return;
 
     const headers = ["Name", "Category", "Price"];
-    const rows = sortedProducts.map(p => [
-      p.name,
-      p.category,
-      p.price
-    ]);
+    const rows = sortedProducts.map(p => [p.name, p.category, p.price]);
 
     const csvContent = [
       headers.join(","),
@@ -86,8 +101,9 @@ function ProductList() {
       {/* Controls */}
       <div style={{ marginBottom: "1rem" }}>
         <input
+          ref={searchInputRef}
           type="text"
-          placeholder="Search by name"
+          placeholder="Search by name (press /)"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           style={{ marginRight: "1rem", padding: "0.25rem" }}
@@ -120,7 +136,6 @@ function ProductList() {
           Sort: Price {priceSort === "asc" ? "↑" : "↓"}
         </button>
 
-        {/* NEW: CSV export */}
         <button
           onClick={exportToCsv}
           disabled={sortedProducts.length === 0}
