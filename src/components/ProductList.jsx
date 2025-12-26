@@ -6,14 +6,12 @@ function ProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Existing features
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [priceSort, setPriceSort] = useState("asc"); // asc | desc
+  const [priceSort, setPriceSort] = useState("asc");
 
-  // NEW: ref for keyboard shortcut
   const searchInputRef = useRef(null);
 
   const fetchProducts = () => {
@@ -38,10 +36,8 @@ function ProductList() {
     fetchProducts();
   }, []);
 
-  // NEW: keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = e => {
-      // Ignore if typing in an input/select/textarea
       const tag = e.target.tagName.toLowerCase();
       if (tag === "input" || tag === "textarea" || tag === "select") return;
 
@@ -66,12 +62,19 @@ function ProductList() {
   );
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (priceSort === "asc") return a.price - b.price;
-    return b.price - a.price;
+    return priceSort === "asc" ? a.price - b.price : b.price - a.price;
   });
 
   const toggleSort = () => {
     setPriceSort(prev => (prev === "asc" ? "desc" : "asc"));
+  };
+
+  // NEW: Clear filters
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("All");
+    setPriceSort("asc");
+    searchInputRef.current?.focus();
   };
 
   const exportToCsv = () => {
@@ -98,7 +101,6 @@ function ProductList() {
 
   return (
     <div>
-      {/* Controls */}
       <div style={{ marginBottom: "1rem" }}>
         <input
           ref={searchInputRef}
@@ -106,13 +108,13 @@ function ProductList() {
           placeholder="Search by name (press /)"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          style={{ marginRight: "1rem", padding: "0.25rem" }}
+          style={{ marginRight: "0.5rem", padding: "0.25rem" }}
         />
 
         <select
           value={selectedCategory}
           onChange={e => setSelectedCategory(e.target.value)}
-          style={{ marginRight: "1rem", padding: "0.25rem" }}
+          style={{ marginRight: "0.5rem", padding: "0.25rem" }}
         >
           {categories.map(c => (
             <option key={c} value={c}>
@@ -124,22 +126,28 @@ function ProductList() {
         <button
           onClick={fetchProducts}
           disabled={refreshing}
-          style={{ marginRight: "1rem", padding: "0.25rem 0.5rem" }}
+          style={{ marginRight: "0.5rem" }}
         >
-          {refreshing ? "Refreshing..." : "Refresh Products"}
+          {refreshing ? "Refreshing..." : "Refresh"}
         </button>
 
         <button
           onClick={toggleSort}
-          style={{ marginRight: "1rem", padding: "0.25rem 0.5rem" }}
+          style={{ marginRight: "0.5rem" }}
         >
           Sort: Price {priceSort === "asc" ? "↑" : "↓"}
         </button>
 
         <button
+          onClick={clearFilters}
+          style={{ marginRight: "0.5rem" }}
+        >
+          Clear Filters
+        </button>
+
+        <button
           onClick={exportToCsv}
           disabled={sortedProducts.length === 0}
-          style={{ padding: "0.25rem 0.5rem" }}
         >
           Export CSV
         </button>
