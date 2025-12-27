@@ -61,15 +61,14 @@ function ProductList() {
     (selectedCategory === "All" || p.category === selectedCategory)
   );
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    return priceSort === "asc" ? a.price - b.price : b.price - a.price;
-  });
+  const sortedProducts = [...filteredProducts].sort((a, b) =>
+    priceSort === "asc" ? a.price - b.price : b.price - a.price
+  );
 
   const toggleSort = () => {
     setPriceSort(prev => (prev === "asc" ? "desc" : "asc"));
   };
 
-  // NEW: Clear filters
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategory("All");
@@ -123,32 +122,19 @@ function ProductList() {
           ))}
         </select>
 
-        <button
-          onClick={fetchProducts}
-          disabled={refreshing}
-          style={{ marginRight: "0.5rem" }}
-        >
+        <button onClick={fetchProducts} disabled={refreshing} style={{ marginRight: "0.5rem" }}>
           {refreshing ? "Refreshing..." : "Refresh"}
         </button>
 
-        <button
-          onClick={toggleSort}
-          style={{ marginRight: "0.5rem" }}
-        >
+        <button onClick={toggleSort} style={{ marginRight: "0.5rem" }}>
           Sort: Price {priceSort === "asc" ? "↑" : "↓"}
         </button>
 
-        <button
-          onClick={clearFilters}
-          style={{ marginRight: "0.5rem" }}
-        >
+        <button onClick={clearFilters} style={{ marginRight: "0.5rem" }}>
           Clear Filters
         </button>
 
-        <button
-          onClick={exportToCsv}
-          disabled={sortedProducts.length === 0}
-        >
+        <button onClick={exportToCsv} disabled={sortedProducts.length === 0}>
           Export CSV
         </button>
       </div>
@@ -159,7 +145,10 @@ function ProductList() {
         </p>
       )}
 
-      <p>Showing {sortedProducts.length} products</p>
+      {/* UPDATED: result count badge */}
+      <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
+        Showing {sortedProducts.length} / {products.length} products
+      </p>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
