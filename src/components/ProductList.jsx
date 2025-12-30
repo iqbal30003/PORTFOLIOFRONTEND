@@ -145,7 +145,6 @@ function ProductList() {
         </p>
       )}
 
-      {/* UPDATED: result count badge */}
       <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
         Showing {sortedProducts.length} / {products.length} products
       </p>
@@ -153,9 +152,24 @@ function ProductList() {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th align="left">Name</th>
-            <th align="left">Category</th>
-            <th align="left">Price</th>
+            <th
+              align="left"
+              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
+            >
+              Name
+            </th>
+            <th
+              align="left"
+              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
+            >
+              Category
+            </th>
+            <th
+              align="left"
+              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
+            >
+              Price
+            </th>
           </tr>
         </thead>
         <tbody>
