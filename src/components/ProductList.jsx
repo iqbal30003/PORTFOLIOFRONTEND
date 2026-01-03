@@ -152,22 +152,13 @@ function ProductList() {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th
-              align="left"
-              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
-            >
+            <th align="left" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
               Name
             </th>
-            <th
-              align="left"
-              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
-            >
+            <th align="left" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
               Category
             </th>
-            <th
-              align="left"
-              style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}
-            >
+            <th align="left" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
               Price
             </th>
           </tr>
@@ -179,7 +170,11 @@ function ProductList() {
             </tr>
           ) : (
             sortedProducts.map(p => (
-              <tr key={p.id}>
+              <tr
+                key={p.id}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
                 <td>{p.name}</td>
                 <td>{p.category}</td>
                 <td>${p.price}</td>
